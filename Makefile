@@ -11,8 +11,8 @@ else
 VERSION_TAG := $(ELASTIC_VERSION)
 endif
 
-ELASTIC_REGISTRY := docker.elastic.co
-VERSIONED_IMAGE := $(ELASTIC_REGISTRY)/elasticsearch/elasticsearch:$(VERSION_TAG)
+ELASTIC_REGISTRY := ae
+VERSIONED_IMAGE := $(ELASTIC_REGISTRY)/elasticsearch:$(VERSION_TAG)
 
 # When invoking docker-compose, use an extra config fragment to map Elasticsearch's
 # listening port to the docker host.
@@ -52,7 +52,7 @@ push: test
 
 # The tests are written in Python. Make a virtualenv to handle the dependencies.
 venv: requirements.txt
-	test -d venv || virtualenv --python=python3.5 venv
+	test -d venv || virtualenv --python=python3 venv
 	pip install -r requirements.txt
 	touch venv
 

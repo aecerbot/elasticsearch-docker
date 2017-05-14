@@ -9,23 +9,34 @@
 {%   set url_root = 'https://artifacts.elastic.co/downloads/elasticsearch' -%}
 {% endif -%}
 
-
-FROM centos:7
-LABEL maintainer "Elastic Docker Team <docker@elastic.co>"
+# Use the fat image
+FROM lawngnome/ubuntu:16.10
+LABEL maintainer "AEcerbot Team <aecerbot@aecerbot.ca>"
 
 ENV PATH /usr/share/elasticsearch/bin:$PATH
 ENV JAVA_HOME /usr/lib/jvm/jre-1.8.0-openjdk
 
-RUN yum install -y java-1.8.0-openjdk-headless wget which && yum clean all
+# Get java; link to known location
+RUN DEBIAN_FRONTEND=noninteractive \
+    && apt-get update \
+    && apt-get install -yq --no-install-recommends \
+        wget \
+        ca-certificates \
+        sudo \
+        locales \
+        openjdk-8-jre-headless \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s $(readlink -f /usr/bin/java | sed "s:jre/bin/java::") /usr/lib/jvm/jre-1.8.0-openjdk
 
-RUN groupadd -g 1000 elasticsearch && adduser -u 1000 -g 1000 -d /usr/share/elasticsearch elasticsearch
+RUN groupadd -g 1000 elasticsearch && useradd -u 1000 -g 1000 -d /usr/share/elasticsearch elasticsearch
 
 WORKDIR /usr/share/elasticsearch
 
 # Download/extract defined ES version. busybox tar can't strip leading dir.
-RUN wget --progress=bar:force {{ url_root }}/{{ tarball }} && \
+RUN wget --progress=bar:force {{ url_root }}/{{ tarball }} && \ 
     EXPECTED_SHA=$(wget -O - {{ url_root }}/{{ tarball }}.sha1) && \
-    test $EXPECTED_SHA == $(sha1sum {{ tarball }} | awk '{print $1}') && \
+    test "$EXPECTED_SHA" = $(sha1sum {{ tarball }} | awk '{print $1}') && \
     tar zxf {{ tarball }} && \
     chown -R elasticsearch:elasticsearch elasticsearch-{{ elastic_version }} && \
     mv elasticsearch-{{ elastic_version }}/* . && \
