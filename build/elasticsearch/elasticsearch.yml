@@ -5,3 +5,9 @@ network.host: 0.0.0.0
 # set to 1 to allow single node clusters
 # Details: https://github.com/elastic/elasticsearch/pull/17288
 discovery.zen.minimum_master_nodes: 1
+
+# disable machine learning (we don't need it and it doesn't run on armhf anyway)
+xpack.ml.enabled: false
+
+# this avoids a check that leads to startup failure (only on armhf)
+bootstrap.system_call_filter: false

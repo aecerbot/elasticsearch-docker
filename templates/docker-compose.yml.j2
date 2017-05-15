@@ -12,7 +12,7 @@ services:
     cap_add:
       - IPC_LOCK
     image: {{ versioned_image }}
-    mem_limit: 4g
+    mem_limit: 400m
     networks:
       esnet:
         aliases:
@@ -37,7 +37,7 @@ services:
       - discovery.zen.ping.unicast.hosts=elasticsearch1
       - node.master=false
     image: {{ versioned_image }}
-    mem_limit: 4g
+    mem_limit: 400m
     networks:
       - esnet
     ulimits:
